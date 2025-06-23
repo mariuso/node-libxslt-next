@@ -1,7 +1,7 @@
 # imitation of this https://github.com/TooTallNate/node-vorbis/blob/master/common.gypi
 {
   'variables': {
-    'node_xmljs%': '<!(node -p "JSON.stringify(require(\'path\').dirname(require.resolve(\'libxmljs2\')))")',
+    'node_xmljs%': '<!(node -pe "require(\'path\').dirname(require.resolve(\'libxmljs2\'))" | sed "s/ /\\\\ /g")',
   },
   'target_defaults': {
     'include_dirs': [
