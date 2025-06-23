@@ -7,11 +7,28 @@ const { execSync } = require('child_process');
 const patchesDir = path.join(__dirname, '..', 'patches');
 const libxsltDir = path.join(__dirname, '..', 'deps', 'libxslt');
 
+// Function to check if specific patches are applied
+function isPatched() {
+  const extensionsFile = path.join(libxsltDir, 'libxslt', 'extensions.c');
+  if (!fs.existsSync(extensionsFile)) {
+    return false;
+  }
+  
+  const content = fs.readFileSync(extensionsFile, 'utf8');
+  // Check for our specific patch - the const xmlChar parameter
+  return content.includes('const xmlChar * name ATTRIBUTE_UNUSED');
+}
+
 // Check if patches have already been applied
 const patchedMarker = path.join(libxsltDir, '.patched');
-if (fs.existsSync(patchedMarker)) {
+if (fs.existsSync(patchedMarker) && isPatched()) {
   console.log('Patches already applied');
   process.exit(0);
+}
+
+// Remove stale marker if patches aren't actually applied
+if (fs.existsSync(patchedMarker)) {
+  fs.unlinkSync(patchedMarker);
 }
 
 // Get all patch files

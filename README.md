@@ -22,6 +22,10 @@ From source:
 		npm install
 		npm test
 
+**Manual Rebuild**: If you need to rebuild the native bindings manually:
+
+    npm run rebuild
+
 Basic usage
 -----------
 
