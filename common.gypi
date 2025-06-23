@@ -4,7 +4,8 @@
     'node_xmljs': '<!(node -p -e "require(\'path\').dirname(require.resolve(\'libxmljs2\'))")',
     'xmljs_include_dirs': [
       '<(node_xmljs)/src/',
-      '<(node_xmljs)/vendor/libxml'
+      '<(node_xmljs)/vendor/libxml',
+      '<(node_xmljs)/vendor/libxml/include'
     ],
     'conditions': [
       ['OS=="win"', {
