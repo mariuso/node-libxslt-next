@@ -1,6 +1,6 @@
 # Development files
 .github/
-test/
+test/typescript-test.ts
 coverage/
 docs/
 *.log

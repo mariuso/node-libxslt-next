@@ -29,6 +29,7 @@ From source:
 Basic usage
 -----------
 
+### JavaScript
 ```js
 var libxslt = require('libxslt-next');
 
@@ -43,6 +44,45 @@ libxslt.parse(stylesheetString, function(err, stylesheet){
     // result is a string containing the result of the transformation
   });  
 });
+```
+
+### TypeScript
+```typescript
+import * as libxslt from 'libxslt-next';
+import { Stylesheet, ApplyOptions } from 'libxslt-next';
+
+// Parse stylesheet with type safety
+libxslt.parse(stylesheetString, (err, stylesheet: Stylesheet | undefined) => {
+  if (err) {
+    console.error('Parse error:', err);
+    return;
+  }
+  
+  if (!stylesheet) return;
+  
+  const params = {
+    MyParam: 'my value'
+  };
+  
+  const options: ApplyOptions = {
+    outputFormat: 'string'
+  };
+  
+  // Apply with full type checking
+  stylesheet.apply(documentString, params, options, (err, result) => {
+    if (err) {
+      console.error('Apply error:', err);
+      return;
+    }
+    
+    // result is properly typed as string | libxmljs.Document
+    console.log('Transform result:', result);
+  });
+});
+
+// Synchronous usage with types
+const stylesheet: Stylesheet = libxslt.parse(stylesheetString);
+const result: string = stylesheet.apply(documentString);
 ```
 
 Libxmljs integration
@@ -146,6 +186,12 @@ Environment compatibility
 - [libxmljs2](https://github.com/libxmljs/libxmljs2) for XML parsing (replaces deprecated libxmljs)
 - [NaN](https://github.com/nodejs/nan) 2.22.2+ for Node.js API compatibility
 - Bundled libxslt (no system dependencies required)
+
+**TypeScript Support**: This package includes built-in TypeScript definitions:
+- No need to install separate `@types` packages
+- Full type safety for all API methods
+- Compatible with TypeScript 3.0+
+- Auto-completion and IntelliSense support in modern IDEs
 
 API Reference
 =============

@@ -3,12 +3,24 @@
   "version": "1.0.2",
   "description": "Node.js bindings for libxslt with Node.js 20/22/24 support - Modern fork with updated dependencies",
   "main": "index.js",
+  "types": "index.d.ts",
+  "files": [
+    "index.js",
+    "index.d.ts",
+    "src/",
+    "deps/",
+    "patches/",
+    "scripts/",
+    "binding.gyp",
+    "common.gypi"
+  ],
   "scripts": {
     "preinstall": "node scripts/apply-patches.js",
     "postinstall": "node-gyp rebuild",
     "rebuild": "node scripts/apply-patches.js && node-gyp rebuild",
     "test": "mocha -R spec",
     "test:coverage": "nyc npm test",
+    "test:types": "tsc --noEmit test/typescript-test.ts",
     "coverage:report": "nyc report --reporter=html",
     "docs": "jsdoc2md index.js --template readme.hbs > README.md"
   },
@@ -22,7 +34,9 @@
     "node22",
     "node24",
     "modern",
-    "libxmljs2"
+    "libxmljs2",
+    "typescript",
+    "types"
   ],
   "author": "Alban Mouton <alban.mouton@gmail.com>",
   "homepage": "https://github.com/mariuso/node-libxslt-next",
@@ -47,10 +61,12 @@
     "nan": "^2.22.2"
   },
   "devDependencies": {
+    "@types/node": "^20.19.1",
     "async": "~3.2.0",
     "jsdoc-to-markdown": "^7.0.1",
     "mocha": "^9.0.2",
     "nyc": "^17.1.0",
-    "should": "~13.2.3"
+    "should": "~13.2.3",
+    "typescript": "^5.8.3"
   }
 }
