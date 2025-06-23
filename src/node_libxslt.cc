@@ -59,10 +59,13 @@ NAN_METHOD(StylesheetSync) {
 
     if (!stylesheet) {
         xmlFreeDoc(doc);
-        return Nan::ThrowError(errstr);
+        Nan::ThrowError(errstr);
+        delete[] errstr;
+        return;
     }
 
     Local<Object> stylesheetWrapper = Stylesheet::New(stylesheet);
+    delete[] errstr;
   	info.GetReturnValue().Set(stylesheetWrapper);
 }
 
@@ -71,16 +74,16 @@ NAN_METHOD(StylesheetSync) {
 class StylesheetWorker : public Nan::AsyncWorker {
  public:
   StylesheetWorker(xmlDoc* doc, Nan::Callback *callback)
-    : Nan::AsyncWorker(callback), doc(doc) {}
-  ~StylesheetWorker() {}
+    : Nan::AsyncWorker(callback), doc(doc), errstr(nullptr) {}
+  ~StylesheetWorker() {
+    if (errstr) delete[] errstr;
+  }
 
   // Executed inside the worker-thread.
   // It is not safe to access V8, or V8 data structures
   // here, so everything we need for input and output
   // should go on `this`.
   void Execute () {
-    libxmljs::WorkerSentinel workerSentinel(workerParent);
-
     // Error management is probably not really thread safe :(
     errstr = new char[2048];;
     xsltSetGenericErrorFunc(errstr, xslt_generic_error_handler);
@@ -96,16 +99,15 @@ class StylesheetWorker : public Nan::AsyncWorker {
     if (!result) {
         xmlFreeDoc(doc);
         Local<Value> argv[] = { Nan::Error(errstr) };
-        callback->Call(1, argv);
+        callback->Call(1, argv, async_resource);
     } else {
         Local<Object> resultWrapper = Stylesheet::New(result);
         Local<Value> argv[] = { Nan::Null(), resultWrapper };
-        callback->Call(2, argv);
+        callback->Call(2, argv, async_resource);
     }
   };
 
  private:
-  libxmljs::WorkerParent workerParent;
   xmlDoc* doc;
   xsltStylesheetPtr result;
   char* errstr;
@@ -185,16 +187,26 @@ NAN_METHOD(ApplySync) {
 class ApplyWorker : public Nan::AsyncWorker {
  public:
   ApplyWorker(Stylesheet* stylesheet, libxmljs::XmlDocument* docSource, char** params, int paramsLength, bool outputString, libxmljs::XmlDocument* docResult, Nan::Callback *callback)
-    : Nan::AsyncWorker(callback), stylesheet(stylesheet), docSource(docSource), params(params), paramsLength(paramsLength), outputString(outputString), docResult(docResult) {}
-  ~ApplyWorker() {}
+    : Nan::AsyncWorker(callback), stylesheet(stylesheet), docSource(docSource), params(params), paramsLength(paramsLength), outputString(outputString), docResult(docResult), result(nullptr) {
+    // Copy the XML document to avoid dependency on V8 objects during async execution
+    sourceDoc = xmlCopyDoc(docSource->xml_obj, 1);
+    resultDoc = docResult->xml_obj;
+  }
+  ~ApplyWorker() {
+    if (params) {
+      freeArray(params, paramsLength);
+    }
+    if (sourceDoc) {
+      xmlFreeDoc(sourceDoc);
+    }
+  }
 
   // Executed inside the worker-thread.
   // It is not safe to access V8, or V8 data structures
   // here, so everything we need for input and output
   // should go on `this`.
   void Execute () {
-    libxmljs::WorkerSentinel workerSentinel(workerParent);
-    result = xsltApplyStylesheet(stylesheet->stylesheet_obj, docSource->xml_obj, (const char **)params);
+    result = xsltApplyStylesheet(stylesheet->stylesheet_obj, sourceDoc, (const char **)params);
   }
 
   // Executed when the async work is complete
@@ -204,8 +216,7 @@ class ApplyWorker : public Nan::AsyncWorker {
     Nan::HandleScope scope;
     if (!result) {
         Local<Value> argv[] = { Nan::Error("Failed to apply stylesheet") };
-        freeArray(params, paramsLength);
-        callback->Call(1, argv);
+        callback->Call(1, argv, async_resource);
         return;
     }
 
@@ -218,8 +229,7 @@ class ApplyWorker : public Nan::AsyncWorker {
       docResult->xml_obj = result;
       result->_private = docResult;
       Local<Value> argv[] = { Nan::Null() };
-      freeArray(params, paramsLength);
-      callback->Call(1, argv);
+      callback->Call(1, argv, async_resource);
     } else {
       unsigned char* resStr;
       int len;
@@ -227,15 +237,15 @@ class ApplyWorker : public Nan::AsyncWorker {
       xmlFreeDoc(result);
       Local<Value> argv[] = { Nan::Null(), Nan::New<String>(resStr ? (char*)resStr : "").ToLocalChecked()};
       if (resStr) xmlFree(resStr);
-      freeArray(params, paramsLength);
-      callback->Call(2, argv);
+      callback->Call(2, argv, async_resource);
     }
 
-
+    // Free params and mark as null so destructor doesn't double-free
+    freeArray(params, paramsLength);
+    params = nullptr;
   };
 
  private:
-  libxmljs::WorkerParent workerParent;
   Stylesheet* stylesheet;
   libxmljs::XmlDocument* docSource;
   char** params;
@@ -243,6 +253,8 @@ class ApplyWorker : public Nan::AsyncWorker {
   bool outputString;
   libxmljs::XmlDocument* docResult;
   xmlDoc* result;
+  xmlDoc* sourceDoc;  // Copied document for thread-safe access
+  xmlDoc* resultDoc;  // Reference to result document
 };
 
 NAN_METHOD(ApplyAsync) {
@@ -262,7 +274,6 @@ NAN_METHOD(ApplyAsync) {
     char** params = PrepareParams(paramsArray, info.GetIsolate());
 
     ApplyWorker* worker = new ApplyWorker(stylesheet, docSource, params, paramsArray->Length(), outputString, docResult, callback);
-    for (uint32_t i = 0; i < 5; ++i) worker->SaveToPersistent(i, info[i]);
     Nan::AsyncQueueWorker(worker);
     return;
 }

@@ -5,7 +5,10 @@ node-libxslt
 [![Code Climate](https://codeclimate.com/github/albanm/node-libxslt/badges/gpa.svg)](https://codeclimate.com/github/albanm/node-libxslt)
 [![NPM version](https://badge.fury.io/js/libxslt.svg)](http://badge.fury.io/js/libxslt)
 
-Node.js bindings for [libxslt](http://xmlsoft.org/libxslt/) compatible with [libxmljs](https://github.com/polotek/libxmljs/issues/226).
+Node.js bindings for [libxslt](http://xmlsoft.org/libxslt/) compatible with [libxmljs2](https://github.com/libxmljs/libxmljs2).
+
+> **⚡ Node.js Compatibility Update**: This version supports Node.js 20.x, 22.x, and 24.x LTS versions. 
+> For users upgrading from Node.js 18 or earlier versions, this package now uses modern dependencies and APIs for improved compatibility and performance.
 
 Installation
 ------------
@@ -18,6 +21,10 @@ From source:
 		git submodule update --init
 		npm install
 		npm test
+
+**Manual Rebuild**: If you need to rebuild the native bindings manually:
+
+    npm run rebuild
 
 Basic usage
 -----------
@@ -123,9 +130,22 @@ Conclusion:
 Environment compatibility
 -------------------------
 
-For now 64bits linux and 32bits windows are confirmed. Other environments are probably ok, but not checked. Please report an issue if you encounter some difficulties.
+**Node.js Support**: This package supports Node.js 20.x, 22.x, and 24.x LTS versions.
 
-Node-libxslt depends on [node-gyp](https://github.com/TooTallNate/node-gyp), you will need to meet its requirements. This can be a bit painful mostly for windows users. The node-gyp version bundled in your npm will have to be greater than 0.13.0, so you might have to follow [these instructions to upgrade](https://github.com/TooTallNate/node-gyp/wiki/Updating-npm's-bundled-node-gyp). There is no system dependancy otherwise, libxslt is bundled in the project.
+**Platform Support**: 
+- ✅ Linux (64-bit)
+- ✅ macOS (Intel & Apple Silicon)
+- ✅ Windows (64-bit)
+
+**Build Requirements**: Node-libxslt depends on [node-gyp](https://github.com/TooTallNate/node-gyp) for native compilation. You will need:
+- Node.js 20.0.0 or higher
+- Python 3.x
+- C++ build tools (Visual Studio Build Tools on Windows)
+
+**Dependencies**: This package uses:
+- [libxmljs2](https://github.com/libxmljs/libxmljs2) for XML parsing (replaces deprecated libxmljs)
+- [NaN](https://github.com/nodejs/nan) 2.22.2+ for Node.js API compatibility
+- Bundled libxslt (no system dependencies required)
 
 API Reference
 =============

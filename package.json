@@ -1,10 +1,15 @@
 {
-  "name": "libxslt",
-  "version": "0.10.2",
-  "description": "[Fork] Node.js bindings for libxslt compatible with libxmljs",
+  "name": "libxslt-next",
+  "version": "1.0.0",
+  "description": "Node.js bindings for libxslt with Node.js 20/22/24 support - Modern fork with updated dependencies",
   "main": "index.js",
   "scripts": {
+    "preinstall": "node scripts/apply-patches.js",
+    "postinstall": "node-gyp rebuild",
+    "rebuild": "node scripts/apply-patches.js && node-gyp rebuild",
     "test": "mocha -R spec",
+    "test:coverage": "nyc npm test",
+    "coverage:report": "nyc report --reporter=html",
     "docs": "jsdoc2md index.js --template readme.hbs > README.md"
   },
   "keywords": [
@@ -12,30 +17,40 @@
     "xsl",
     "xslt",
     "libxslt",
-    "bindings"
+    "bindings",
+    "node20",
+    "node22",
+    "node24",
+    "modern",
+    "libxmljs2"
   ],
   "author": "Alban Mouton <alban.mouton@gmail.com>",
-  "homepage": "https://github.com/albanm/node-libxslt",
+  "homepage": "https://github.com/USERNAME/node-libxslt",
   "contributors": [
-    "Rui Azevedo <ruihfazevedo@gmail.com> (http://www.r-site.net/)"
+    "Rui Azevedo <ruihfazevedo@gmail.com> (http://www.r-site.net/)",
+    "Marius Oseth <marius@osethconsult.no>"
   ],
   "bugs": {
-    "url": "https://github.com/albanm/node-libxslt/issues"
+    "url": "https://github.com/USERNAME/node-libxslt/issues"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/albanm/node-libxslt.git"
+    "url": "https://github.com/USERNAME/node-libxslt.git"
   },
   "license": "MIT",
+  "engines": {
+    "node": ">=20.0.0"
+  },
   "dependencies": {
     "bindings": "^1.5.0",
-    "nan": "~2.14.2",
-    "node1-libxmljsmt-myh": "1.0.8"
+    "libxmljs2": "^0.37.0",
+    "nan": "^2.22.2"
   },
   "devDependencies": {
     "async": "~3.2.0",
     "jsdoc-to-markdown": "^7.0.1",
     "mocha": "^9.0.2",
+    "nyc": "^17.1.0",
     "should": "~13.2.3"
   }
 }

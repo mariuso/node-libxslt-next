@@ -60,7 +60,7 @@
         'libxslt/libxslt/xsltutils.c'
       ],
       'dependencies': [
-        '<(node_xmljs)/binding.gyp:xmljs-myh'
+        '<(node_xmljs)/binding.gyp:xmljs'
       ],
       'link_settings': {
         'libraries': [
