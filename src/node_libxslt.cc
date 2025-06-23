@@ -187,10 +187,17 @@ NAN_METHOD(ApplySync) {
 class ApplyWorker : public Nan::AsyncWorker {
  public:
   ApplyWorker(Stylesheet* stylesheet, libxmljs::XmlDocument* docSource, char** params, int paramsLength, bool outputString, libxmljs::XmlDocument* docResult, Nan::Callback *callback)
-    : Nan::AsyncWorker(callback), stylesheet(stylesheet), docSource(docSource), params(params), paramsLength(paramsLength), outputString(outputString), docResult(docResult), result(nullptr) {}
+    : Nan::AsyncWorker(callback), stylesheet(stylesheet), docSource(docSource), params(params), paramsLength(paramsLength), outputString(outputString), docResult(docResult), result(nullptr) {
+    // Copy the XML document to avoid dependency on V8 objects during async execution
+    sourceDoc = xmlCopyDoc(docSource->xml_obj, 1);
+    resultDoc = docResult->xml_obj;
+  }
   ~ApplyWorker() {
     if (params) {
       freeArray(params, paramsLength);
+    }
+    if (sourceDoc) {
+      xmlFreeDoc(sourceDoc);
     }
   }
 
@@ -199,7 +206,7 @@ class ApplyWorker : public Nan::AsyncWorker {
   // here, so everything we need for input and output
   // should go on `this`.
   void Execute () {
-    result = xsltApplyStylesheet(stylesheet->stylesheet_obj, docSource->xml_obj, (const char **)params);
+    result = xsltApplyStylesheet(stylesheet->stylesheet_obj, sourceDoc, (const char **)params);
   }
 
   // Executed when the async work is complete
@@ -246,6 +253,8 @@ class ApplyWorker : public Nan::AsyncWorker {
   bool outputString;
   libxmljs::XmlDocument* docResult;
   xmlDoc* result;
+  xmlDoc* sourceDoc;  // Copied document for thread-safe access
+  xmlDoc* resultDoc;  // Reference to result document
 };
 
 NAN_METHOD(ApplyAsync) {
@@ -265,12 +274,6 @@ NAN_METHOD(ApplyAsync) {
     char** params = PrepareParams(paramsArray, info.GetIsolate());
 
     ApplyWorker* worker = new ApplyWorker(stylesheet, docSource, params, paramsArray->Length(), outputString, docResult, callback);
-    // Save all the V8 objects to prevent garbage collection during async operation
-    worker->SaveToPersistent("stylesheet", info[0]);
-    worker->SaveToPersistent("docSource", info[1]);
-    worker->SaveToPersistent("params", info[2]);
-    worker->SaveToPersistent("outputString", info[3]);
-    worker->SaveToPersistent("docResult", info[4]);
     Nan::AsyncQueueWorker(worker);
     return;
 }
