@@ -22,3 +22,6 @@ backup
 .nyc_output/
 mise.toml
 coverage/
+
+# Patch system markers
+deps/libxslt/.patched

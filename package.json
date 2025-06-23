@@ -4,6 +4,7 @@
   "description": "Node.js bindings for libxslt with Node.js 20/22/24 support - Modern fork with updated dependencies",
   "main": "index.js",
   "scripts": {
+    "preinstall": "node scripts/apply-patches.js",
     "test": "mocha -R spec",
     "test:coverage": "nyc npm test",
     "coverage:report": "nyc report --reporter=html",
