@@ -1,6 +1,6 @@
 {
   "name": "libxslt-next",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Node.js bindings for libxslt with Node.js 20/22/24 support - Modern fork with updated dependencies",
   "main": "index.js",
   "scripts": {
