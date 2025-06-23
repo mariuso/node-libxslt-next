@@ -79,8 +79,6 @@ class StylesheetWorker : public Nan::AsyncWorker {
   // here, so everything we need for input and output
   // should go on `this`.
   void Execute () {
-    libxmljs::WorkerSentinel workerSentinel(workerParent);
-
     // Error management is probably not really thread safe :(
     errstr = new char[2048];;
     xsltSetGenericErrorFunc(errstr, xslt_generic_error_handler);
@@ -96,16 +94,15 @@ class StylesheetWorker : public Nan::AsyncWorker {
     if (!result) {
         xmlFreeDoc(doc);
         Local<Value> argv[] = { Nan::Error(errstr) };
-        callback->Call(1, argv);
+        callback->Call(1, argv, async_resource);
     } else {
         Local<Object> resultWrapper = Stylesheet::New(result);
         Local<Value> argv[] = { Nan::Null(), resultWrapper };
-        callback->Call(2, argv);
+        callback->Call(2, argv, async_resource);
     }
   };
 
  private:
-  libxmljs::WorkerParent workerParent;
   xmlDoc* doc;
   xsltStylesheetPtr result;
   char* errstr;
@@ -193,7 +190,6 @@ class ApplyWorker : public Nan::AsyncWorker {
   // here, so everything we need for input and output
   // should go on `this`.
   void Execute () {
-    libxmljs::WorkerSentinel workerSentinel(workerParent);
     result = xsltApplyStylesheet(stylesheet->stylesheet_obj, docSource->xml_obj, (const char **)params);
   }
 
@@ -205,7 +201,7 @@ class ApplyWorker : public Nan::AsyncWorker {
     if (!result) {
         Local<Value> argv[] = { Nan::Error("Failed to apply stylesheet") };
         freeArray(params, paramsLength);
-        callback->Call(1, argv);
+        callback->Call(1, argv, async_resource);
         return;
     }
 
@@ -219,7 +215,7 @@ class ApplyWorker : public Nan::AsyncWorker {
       result->_private = docResult;
       Local<Value> argv[] = { Nan::Null() };
       freeArray(params, paramsLength);
-      callback->Call(1, argv);
+      callback->Call(1, argv, async_resource);
     } else {
       unsigned char* resStr;
       int len;
@@ -228,14 +224,13 @@ class ApplyWorker : public Nan::AsyncWorker {
       Local<Value> argv[] = { Nan::Null(), Nan::New<String>(resStr ? (char*)resStr : "").ToLocalChecked()};
       if (resStr) xmlFree(resStr);
       freeArray(params, paramsLength);
-      callback->Call(2, argv);
+      callback->Call(2, argv, async_resource);
     }
 
 
   };
 
  private:
-  libxmljs::WorkerParent workerParent;
   Stylesheet* stylesheet;
   libxmljs::XmlDocument* docSource;
   char** params;
