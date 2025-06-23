@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "preinstall": "node scripts/apply-patches.js",
+    "postinstall": "node-gyp rebuild",
     "rebuild": "node scripts/apply-patches.js && node-gyp rebuild",
     "test": "mocha -R spec",
     "test:coverage": "nyc npm test",
