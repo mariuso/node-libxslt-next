@@ -25,17 +25,17 @@
     "libxmljs2"
   ],
   "author": "Alban Mouton <alban.mouton@gmail.com>",
-  "homepage": "https://github.com/USERNAME/node-libxslt",
+  "homepage": "https://github.com/mariuso/node-libxslt-next",
   "contributors": [
     "Rui Azevedo <ruihfazevedo@gmail.com> (http://www.r-site.net/)",
     "Marius Oseth <marius@osethconsult.no>"
   ],
   "bugs": {
-    "url": "https://github.com/USERNAME/node-libxslt/issues"
+    "url": "https://github.com/mariuso/node-libxslt-next/issues"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/USERNAME/node-libxslt.git"
+    "url": "https://github.com/mariuso/node-libxslt-next.git"
   },
   "license": "MIT",
   "engines": {
