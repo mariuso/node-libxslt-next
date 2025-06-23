@@ -265,7 +265,12 @@ NAN_METHOD(ApplyAsync) {
     char** params = PrepareParams(paramsArray, info.GetIsolate());
 
     ApplyWorker* worker = new ApplyWorker(stylesheet, docSource, params, paramsArray->Length(), outputString, docResult, callback);
-    for (uint32_t i = 0; i < 5; ++i) worker->SaveToPersistent(i, info[i]);
+    // Save all the V8 objects to prevent garbage collection during async operation
+    worker->SaveToPersistent("stylesheet", info[0]);
+    worker->SaveToPersistent("docSource", info[1]);
+    worker->SaveToPersistent("params", info[2]);
+    worker->SaveToPersistent("outputString", info[3]);
+    worker->SaveToPersistent("docResult", info[4]);
     Nan::AsyncQueueWorker(worker);
     return;
 }

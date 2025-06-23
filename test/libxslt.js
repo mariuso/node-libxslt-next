@@ -141,7 +141,7 @@ describe('node-libxslt', function() {
 		});*/
 	});
 
-	describe.skip('asynchronous apply function', function() {
+	describe('asynchronous apply function', function() {
 		it('should apply a stylesheet to a libxslt.libxmljs xml document', function(callback) {
 			var doc = libxslt.libxmljs.parseXml(docSource);
 			var stylesheet = libxslt.parse(stylesheetSource);
