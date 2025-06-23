@@ -21,6 +21,7 @@
     "test": "mocha -R spec",
     "test:coverage": "nyc npm test",
     "test:types": "tsc --noEmit test/typescript-test.ts",
+    "test:spaces": "node test/spaces-in-path.js",
     "coverage:report": "nyc report --reporter=html",
     "docs": "jsdoc2md index.js --template readme.hbs > README.md"
   },
