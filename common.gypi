@@ -10,7 +10,7 @@
     'conditions': [
       ['OS=="win"', {
         'xmljs_libraries': [
-          '<(node_xmljs)/build/Release/xmljs.lib'
+          '../build/Release/xmljs.lib'
         ],
       }, {
         'xmljs_libraries': [
