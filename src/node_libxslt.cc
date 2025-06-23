@@ -59,10 +59,13 @@ NAN_METHOD(StylesheetSync) {
 
     if (!stylesheet) {
         xmlFreeDoc(doc);
-        return Nan::ThrowError(errstr);
+        Nan::ThrowError(errstr);
+        delete[] errstr;
+        return;
     }
 
     Local<Object> stylesheetWrapper = Stylesheet::New(stylesheet);
+    delete[] errstr;
   	info.GetReturnValue().Set(stylesheetWrapper);
 }
 
@@ -71,8 +74,10 @@ NAN_METHOD(StylesheetSync) {
 class StylesheetWorker : public Nan::AsyncWorker {
  public:
   StylesheetWorker(xmlDoc* doc, Nan::Callback *callback)
-    : Nan::AsyncWorker(callback), doc(doc) {}
-  ~StylesheetWorker() {}
+    : Nan::AsyncWorker(callback), doc(doc), errstr(nullptr) {}
+  ~StylesheetWorker() {
+    if (errstr) delete[] errstr;
+  }
 
   // Executed inside the worker-thread.
   // It is not safe to access V8, or V8 data structures

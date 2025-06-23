@@ -128,23 +128,23 @@ var applyAsyncParallelObj = function(iterations, callback) {
 	}, callback); 
 };
 
-var iterations = 10000;
+var iterations = 1000;
 async.series([
 	//bench('synchronous parse from string\t\t\t', iterations, stylesheetSyncParsingStr),
 	bench('synchronous parse from parsed doc\t\t\t', iterations, stylesheetSyncParsingObj),
 
 	//bench('asynchronous parse in series from string\t\t\t', iterations, stylesheetAsyncSeriesParsingStr),
-	bench('asynchronous parse in series from parsed doc\t', iterations, stylesheetAsyncSeriesParsingObj),
+	//bench('asynchronous parse in series from parsed doc\t', iterations, stylesheetAsyncSeriesParsingObj),
 
 	//bench('asynchronous parse in parallel from string\t\t\t', iterations, stylesheetAsyncParallelParsingStr),
-	bench('asynchronous parse in parallel from parsed doc\t', iterations, stylesheetAsyncParallelParsingObj),
+	//bench('asynchronous parse in parallel from parsed doc\t', iterations, stylesheetAsyncParallelParsingObj),
 
 	//bench('synchronous apply from string\t\t\t', iterations, applySyncStr),
 	bench('synchronous apply from parsed doc\t\t\t', iterations, applySyncObj),
 
 	//bench('asynchronous apply in series from string\t\t', iterations, applyAsyncSeriesStr),
-	bench('asynchronous apply in series from parsed doc\t', iterations, applyAsyncSeriesObj),
+	//bench('asynchronous apply in series from parsed doc\t', iterations, applyAsyncSeriesObj),
 
 	//bench('asynchronous apply in parallel from string\t', iterations, applyAsyncParallelStr),
-	bench('asynchronous apply in parallel from parsed doc\t', iterations, applyAsyncParallelObj)
+	//bench('asynchronous apply in parallel from parsed doc\t', iterations, applyAsyncParallelObj)
 ]);
