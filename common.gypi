@@ -1,21 +1,22 @@
 # imitation of this https://github.com/TooTallNate/node-vorbis/blob/master/common.gypi
 {
-  'variables': {
-    'node_xmljs': '<!(node -e "console.log(require(\'path\').dirname(require.resolve(\'libxmljs2\')))")',
-    'xmljs_include_dirs': [
-      '<(node_xmljs)/src/',
-      '<(node_xmljs)/vendor/libxml',
-      '<(node_xmljs)/vendor/libxml/include'
+  'target_defaults': {
+    'include_dirs': [
+      '<!(node -p "require(\'path\').join(require(\'path\').dirname(require.resolve(\'libxmljs2\')), \'src\')")',
+      '<!(node -p "require(\'path\').join(require(\'path\').dirname(require.resolve(\'libxmljs2\')), \'vendor\', \'libxml\')")',
+      '<!(node -p "require(\'path\').join(require(\'path\').dirname(require.resolve(\'libxmljs2\')), \'vendor\', \'libxml\', \'include\')")'
     ],
     'conditions': [
       ['OS=="win"', {
-        'xmljs_libraries': [
+        'libraries': [
           '<(PRODUCT_DIR)/xmljs.lib'
         ],
       }, {
-        'xmljs_libraries': [
-          '<(node_xmljs)/build/$(BUILDTYPE)/xmljs.node',
-          '-Wl,-rpath,<(node_xmljs)/build/$(BUILDTYPE)'
+        'libraries': [
+          '<!(node -p "require(\'path\').join(require(\'path\').dirname(require.resolve(\'libxmljs2\')), \'build\', process.env.npm_config_build_type || \'Release\', \'xmljs.node\')")'
+        ],
+        'library_dirs': [
+          '<!(node -p "require(\'path\').join(require(\'path\').dirname(require.resolve(\'libxmljs2\')), \'build\', process.env.npm_config_build_type || \'Release\')")'
         ],
       }],
     ],

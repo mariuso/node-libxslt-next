@@ -44,7 +44,7 @@ patches.forEach(patchFile => {
   console.log(`Applying ${patchFile}...`);
   
   try {
-    execSync(`patch -p1 < ${patchPath}`, {
+    execSync(`patch -p1 < "${patchPath}"`, {
       cwd: libxsltDir,
       stdio: 'inherit'
     });

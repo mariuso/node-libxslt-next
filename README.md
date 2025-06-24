@@ -1,9 +1,9 @@
-node-libxslt
+libxslt-next
 ============
 
 [![Build status](https://travis-ci.org/albanm/node-libxslt.svg)](https://travis-ci.org/albanm/node-libxslt)
 [![Code Climate](https://codeclimate.com/github/albanm/node-libxslt/badges/gpa.svg)](https://codeclimate.com/github/albanm/node-libxslt)
-[![NPM version](https://badge.fury.io/js/libxslt.svg)](http://badge.fury.io/js/libxslt)
+[![NPM version](https://badge.fury.io/js/libxslt-next.svg)](http://badge.fury.io/js/libxslt-next)
 
 Node.js bindings for [libxslt](http://xmlsoft.org/libxslt/) compatible with [libxmljs2](https://github.com/libxmljs/libxmljs2).
 
@@ -13,11 +13,11 @@ Node.js bindings for [libxslt](http://xmlsoft.org/libxslt/) compatible with [lib
 Installation
 ------------
 
-    npm install libxslt
+    npm install libxslt-next
 
 From source:
 
-    git clone https://github.com/albanm/node-libxslt.git
+    git clone https://github.com/mariuso/node-libxslt-next.git
 		git submodule update --init
 		npm install
 		npm test
@@ -29,8 +29,9 @@ From source:
 Basic usage
 -----------
 
+### JavaScript
 ```js
-var libxslt = require('libxslt');
+var libxslt = require('libxslt-next');
 
 libxslt.parse(stylesheetString, function(err, stylesheet){
   var params = {
@@ -45,17 +46,56 @@ libxslt.parse(stylesheetString, function(err, stylesheet){
 });
 ```
 
+### TypeScript
+```typescript
+import * as libxslt from 'libxslt-next';
+import { Stylesheet, ApplyOptions } from 'libxslt-next';
+
+// Parse stylesheet with type safety
+libxslt.parse(stylesheetString, (err, stylesheet: Stylesheet | undefined) => {
+  if (err) {
+    console.error('Parse error:', err);
+    return;
+  }
+  
+  if (!stylesheet) return;
+  
+  const params = {
+    MyParam: 'my value'
+  };
+  
+  const options: ApplyOptions = {
+    outputFormat: 'string'
+  };
+  
+  // Apply with full type checking
+  stylesheet.apply(documentString, params, options, (err, result) => {
+    if (err) {
+      console.error('Apply error:', err);
+      return;
+    }
+    
+    // result is properly typed as string | libxmljs.Document
+    console.log('Transform result:', result);
+  });
+});
+
+// Synchronous usage with types
+const stylesheet: Stylesheet = libxslt.parse(stylesheetString);
+const result: string = stylesheet.apply(documentString);
+```
+
 Libxmljs integration
 --------------------
 
-Node-libxslt depends on [libxmljs](https://github.com/polotek/libxmljs/issues/226) in the same way that [libxslt](http://xmlsoft.org/libxslt/) depends on [libxml](http://xmlsoft.org/). This dependancy makes possible to bundle and to load in memory libxml only once for users of both libraries.
+libxslt-next depends on [libxmljs2](https://github.com/libxmljs/libxmljs2) in the same way that [libxslt](http://xmlsoft.org/libxslt/) depends on [libxml](http://xmlsoft.org/). This dependancy makes possible to bundle and to load in memory libxml only once for users of both libraries.
 
-The libxmljs module required by node-libxslt is exposed as ```require('libxslt').libxmljs```. This prevents depending on libxmljs twice which is not optimal and source of weird bugs.
+The libxmljs module required by libxslt-next is exposed as ```require('libxslt-next').libxmljs```. This prevents depending on libxmljs twice which is not optimal and source of weird bugs.
 
 It is possible to work with libxmljs documents instead of strings:
 
 ```js
-var libxslt = require('libxslt');
+var libxslt = require('libxslt-next');
 var libxmljs = libxslt.libxmljs;
 
 var stylesheetObj = libxmljs.parseXml(stylesheetString, { nocdata: true });
@@ -86,7 +126,7 @@ The same *parse()* and *apply()* functions can be used in synchronous mode simpl
 In this case if a parsing error occurs it will be thrown.
 
 ```js
-var lixslt = require('libxslt');
+var lixslt = require('libxslt-next');
 
 var stylesheet = libxslt.parse(stylesheetString);
 
@@ -137,7 +177,7 @@ Environment compatibility
 - ✅ macOS (Intel & Apple Silicon)
 - ✅ Windows (64-bit)
 
-**Build Requirements**: Node-libxslt depends on [node-gyp](https://github.com/TooTallNate/node-gyp) for native compilation. You will need:
+**Build Requirements**: libxslt-next depends on [node-gyp](https://github.com/TooTallNate/node-gyp) for native compilation. You will need:
 - Node.js 20.0.0 or higher
 - Python 3.x
 - C++ build tools (Visual Studio Build Tools on Windows)
@@ -146,6 +186,12 @@ Environment compatibility
 - [libxmljs2](https://github.com/libxmljs/libxmljs2) for XML parsing (replaces deprecated libxmljs)
 - [NaN](https://github.com/nodejs/nan) 2.22.2+ for Node.js API compatibility
 - Bundled libxslt (no system dependencies required)
+
+**TypeScript Support**: This package includes built-in TypeScript definitions:
+- No need to install separate `@types` packages
+- Full type safety for all API methods
+- Compatible with TypeScript 3.0+
+- Auto-completion and IntelliSense support in modern IDEs
 
 API Reference
 =============
