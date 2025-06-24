@@ -1,13 +1,10 @@
 # imitation of this https://github.com/TooTallNate/node-vorbis/blob/master/common.gypi
 {
-  'variables': {
-    'node_xmljs%': '<!(node -p "require(\'path\').dirname(require.resolve(\'libxmljs2\'))")',
-  },
   'target_defaults': {
     'include_dirs': [
-      '<(node_xmljs)/src',
-      '<(node_xmljs)/vendor/libxml',
-      '<(node_xmljs)/vendor/libxml/include'
+      '<!(node -p "require(\'path\').join(require(\'path\').dirname(require.resolve(\'libxmljs2\')), \'src\')")',
+      '<!(node -p "require(\'path\').join(require(\'path\').dirname(require.resolve(\'libxmljs2\')), \'vendor\', \'libxml\')")',
+      '<!(node -p "require(\'path\').join(require(\'path\').dirname(require.resolve(\'libxmljs2\')), \'vendor\', \'libxml\', \'include\')")'
     ],
     'conditions': [
       ['OS=="win"', {
@@ -16,10 +13,10 @@
         ],
       }, {
         'libraries': [
-          '<(node_xmljs)/build/<(CONFIGURATION_NAME)/xmljs.node'
+          '<!(node -p "require(\'path\').join(require(\'path\').dirname(require.resolve(\'libxmljs2\')), \'build\', process.env.npm_config_build_type || \'Release\', \'xmljs.node\')")'
         ],
         'library_dirs': [
-          '<(node_xmljs)/build/<(CONFIGURATION_NAME)'
+          '<!(node -p "require(\'path\').join(require(\'path\').dirname(require.resolve(\'libxmljs2\')), \'build\', process.env.npm_config_build_type || \'Release\')")'
         ],
       }],
     ],
