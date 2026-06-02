@@ -1,14 +1,20 @@
 libxslt-next
 ============
 
-[![Build status](https://travis-ci.org/albanm/node-libxslt.svg)](https://travis-ci.org/albanm/node-libxslt)
-[![Code Climate](https://codeclimate.com/github/albanm/node-libxslt/badges/gpa.svg)](https://codeclimate.com/github/albanm/node-libxslt)
-[![NPM version](https://badge.fury.io/js/libxslt-next.svg)](http://badge.fury.io/js/libxslt-next)
+[![CI](https://github.com/mariuso/node-libxslt-next/actions/workflows/ci.yml/badge.svg)](https://github.com/mariuso/node-libxslt-next/actions/workflows/ci.yml)
+[![npm version](https://img.shields.io/npm/v/libxslt-next.svg)](https://www.npmjs.com/package/libxslt-next)
+[![node](https://img.shields.io/node/v/libxslt-next.svg)](https://www.npmjs.com/package/libxslt-next)
+[![license](https://img.shields.io/npm/l/libxslt-next.svg)](./LICENSE)
 
-Node.js bindings for [libxslt](http://xmlsoft.org/libxslt/) compatible with [libxmljs2](https://github.com/libxmljs/libxmljs2).
+Node.js bindings for [libxslt](http://xmlsoft.org/libxslt/), compatible with [libxmljs2](https://github.com/libxmljs/libxmljs2).
 
-> **⚡ Node.js Compatibility Update**: This version supports Node.js 22.x and 24.x LTS versions.
-> For users upgrading from Node.js 20 or earlier versions, this package now uses modern dependencies and APIs for improved compatibility and performance.
+A modern, maintained fork of [node-libxslt](https://github.com/albanm/node-libxslt) with updated
+dependencies, TypeScript types, and support for current Node.js LTS releases.
+
+- **Node.js 22.x and 24.x** (Node 20 is not supported — `libxmljs2@0.37` requires Node ≥ 22)
+- **Linux (glibc & musl/Alpine), macOS (Intel & Apple Silicon), Windows** — all built from source
+- **TypeScript types** included
+- Install paths containing spaces are supported (Linux, macOS and Windows)
 
 Installation
 ------------
@@ -17,14 +23,22 @@ Installation
 
 From source:
 
-    git clone https://github.com/mariuso/node-libxslt-next.git
-		git submodule update --init
-		npm install
-		npm test
+```sh
+git clone https://github.com/mariuso/node-libxslt-next.git
+cd node-libxslt-next
+git submodule update --init
+npm install
+npm test
+```
 
-**Manual Rebuild**: If you need to rebuild the native bindings manually:
+**Manual rebuild**: if you need to rebuild the native bindings:
 
-    npm run rebuild
+```sh
+npm run rebuild
+```
+
+The native addon is compiled on install, so a C/C++ toolchain and Python 3 must be
+present (see [Environment compatibility](#environment-compatibility) below).
 
 ### Alpine / musl
 

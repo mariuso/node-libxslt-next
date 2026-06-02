@@ -86,6 +86,27 @@ jobs:
     - name: Test module loading
       run: node -e "console.log('✅ Module loads:', !!require('./index.js'))"
 
+    - name: Build and load in a path containing spaces
+      run: npm run test:spaces
+
+  spaces-windows:
+    # Spaced-path build on Windows. The msvs/MSBuild generator quotes paths, so
+    # (unlike the make generator) spaces work here; this guards that.
+    runs-on: windows-2022
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        submodules: recursive
+    - name: Use Node.js 22.x
+      uses: actions/setup-node@v4
+      with:
+        node-version: 22.x
+    - name: Install dependencies
+      run: npm install
+    - name: Build and load in a path containing spaces
+      run: npm run test:spaces
+
   alpine-musl:
     # Regression test for ERR_DLOPEN_FAILED on musl (Alpine): node-libxslt.node
     # links xmljs.node by basename, which musl resolves via the runtime library
