@@ -90,7 +90,8 @@ jobs:
       run: npm run test:spaces
 
   spaces-windows:
-    # Experiment: does a fresh build in a spaced directory work on Windows?
+    # Spaced-path build on Windows. The msvs/MSBuild generator quotes paths, so
+    # (unlike the make generator) spaces work here; this guards that.
     runs-on: windows-2022
     steps:
     - name: Checkout code
