@@ -50,8 +50,18 @@ exports.parse = function(source, callback) {
 	}
 
 	if (callback) {
-		binding.stylesheetAsync(source, function(err, stylesheet){
-			if (err) return callback(err);
+		// Run on the main thread, deferred. libxslt/libxml2 share process- and
+		// thread-global state with libxmljs2; parsing a stylesheet on a libuv
+		// worker thread while the main thread uses libxml2 races and intermittently
+		// yields a corrupt result or crashes. The synchronous path is reliable, so
+		// defer to it to keep the callback (non-blocking-call) contract. See #4.
+		setImmediate(function() {
+			var stylesheet;
+			try {
+				stylesheet = binding.stylesheetSync(source);
+			} catch (err) {
+				return callback(err);
+			}
 			callback(null, new Stylesheet(source, stylesheet));
 		});
 	} else {
@@ -155,8 +165,19 @@ Stylesheet.prototype.apply = function(source, params, options, callback) {
 	var docResult = new libxmljs.Document();
 
 	if (callback) {
-		binding.applyAsync(this.stylesheetObj, source, paramsArray, outputString, docResult, function(err, strResult){
-			if (err) return callback(err);
+		// Run on the main thread, deferred. Applying a stylesheet on a libuv worker
+		// thread shares the stylesheet and libxslt/libxml2 global state with the
+		// main thread (and libxmljs2), which races and intermittently produces an
+		// empty result or a segfault. The synchronous path is reliable, so defer to
+		// it to keep the callback (non-blocking-call) contract. See #4.
+		var self = this;
+		setImmediate(function() {
+			var strResult;
+			try {
+				strResult = binding.applySync(self.stylesheetObj, source, paramsArray, outputString, docResult);
+			} catch (err) {
+				return callback(err);
+			}
 			callback(null, outputString ? strResult : docResult);
 		});
 	} else {

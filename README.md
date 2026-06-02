@@ -153,38 +153,30 @@ var result = stylesheet.apply(documentString);
 
 ```
 
-The asynchronous functions use the [libuv work queue](http://nikhilm.github.io/uvbook/threads.html#libuv-work-queue)
-to provide parallelized computation in node.js worker threads. This makes it non-blocking for the main event loop of node.js.
+When a callback is given, *parse()* and *apply()* run the transform on the main
+thread but invoke the callback on a later tick of the event loop (via
+`setImmediate`). The call returns immediately and errors are delivered to the
+callback instead of being thrown.
 
-Note that libxmljs parsing doesn't use the work queue, so only a part of the process is actually parallelized.
+> **Note on parallelism:** earlier versions ran the libxslt computation on a
+> libuv worker thread. That was removed because libxslt/libxml2 share global
+> state with libxmljs2 and are not safe to run off the main thread, which caused
+> intermittent empty results and crashes. The callback form therefore does **not**
+> parallelize CPU work across threads — it only defers it. If you need true
+> parallelism for CPU-bound transforms, run libxslt-next inside your own
+> [`worker_threads`](https://nodejs.org/api/worker_threads.html) pool.
 
-A small benchmark is available in the project. It has a very limited scope, it uses always the same small transformation a few thousand times.
-To run it use:
+A small benchmark is available in the project (it always runs the same small
+transformation a few thousand times):
 
     node benchmark.js
 
-This is an example of its results with an intel core i5 3.1GHz:
-
-```
-10000 synchronous parse from parsed doc                in 52ms = 192308/s
-10000 asynchronous parse in series from parsed doc     in 229ms = 43668/s
-10000 asynchronous parse in parallel from parsed doc   in 56ms = 178571/s
-10000 synchronous apply from parsed doc                in 329ms = 30395/s
-10000 asynchronous apply in series from parsed doc     in 569ms = 17575/s
-10000 asynchronous apply in parallel from parsed doc   in 288ms = 34722/s
-
-```
-
-Observations:
-  - it's pretty fast !
-  - asynchronous is slower when running in series.
-  - asynchronous can become faster when concurrency is high.
-
-Conclusion:
-  - use asynchronous by default it will be kinder to your main event loop and is pretty fast anyway.
-  - use synchronous only if you really want the highest performance and expect low concurrency.
-  - of course you can also use synchronous simply to reduce code depth. If you don't expect a huge load it will be ok.
-  - DO NOT USE synchronous parsing if there is some includes in your XSL stylesheets.
+Guidance:
+  - the synchronous and callback forms do the same amount of work; the callback
+    form only differs in that it yields to the event loop before running.
+  - of course you can use synchronous simply to reduce code depth.
+  - DO NOT USE synchronous parsing if there are includes in your XSL stylesheets
+    (include resolution makes parsing IO-bound).
 
 Environment compatibility
 -------------------------
