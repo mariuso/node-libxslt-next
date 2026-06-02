@@ -1,5 +1,10 @@
 # imitation of this https://github.com/TooTallNate/node-vorbis/blob/master/common.gypi
 {
+  'variables': {
+    # Directory of the installed libxmljs2 package. Used on Windows to build its
+    # xmljs addon into our PRODUCT_DIR so xmljs.lib is available to link against.
+    'node_xmljs': '<!(node -p "require(\'path\').dirname(require.resolve(\'libxmljs2\'))")',
+  },
   'target_defaults': {
     'include_dirs': [
       '<!(node -p "require(\'path\').join(require(\'path\').dirname(require.resolve(\'libxmljs2\')), \'src\')")',
@@ -8,12 +13,10 @@
     ],
     'conditions': [
       ['OS=="win"', {
-        # Link against libxmljs2's import library in its own build dir, resolved
-        # via require.resolve. Using <(PRODUCT_DIR)/xmljs.lib pointed at this
-        # addon's build dir, where xmljs.lib never exists -> LNK1181.
-        'libraries': [
-          '<!(node -p "require(\'path\').join(require(\'path\').dirname(require.resolve(\'libxmljs2\')), \'build\', process.env.npm_config_build_type || \'Release\', \'xmljs.lib\')")'
-        ],
+        # Windows linking is handled on the node-libxslt target in binding.gyp:
+        # it builds libxmljs2's xmljs target into our PRODUCT_DIR (producing
+        # xmljs.lib) and links against it. Keeping that out of target_defaults
+        # avoids the xmljs dependency target trying to link against itself.
       }, {
         'libraries': [
           '<!(node -p "require(\'path\').join(require(\'path\').dirname(require.resolve(\'libxmljs2\')), \'build\', process.env.npm_config_build_type || \'Release\', \'xmljs.node\')")'
