@@ -79,7 +79,42 @@ jobs:
         
     - name: Test module loading
       run: node -e "console.log('✅ Module loads:', !!require('./index.js'))"
-      
+
+  alpine-musl:
+    # Regression test for ERR_DLOPEN_FAILED on musl (Alpine): node-libxslt.node
+    # links xmljs.node by basename, which musl resolves via the runtime library
+    # path. The rpath added in common.gypi must let the module load here.
+    runs-on: ubuntu-latest
+    container:
+      image: node:24-alpine
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        submodules: recursive
+
+    - name: Install system dependencies
+      run: apk add --no-cache build-base python3 git binutils
+
+    - name: Install dependencies (builds from source)
+      run: npm install
+
+    - name: Verify build artifacts
+      run: |
+        test -f build/Release/node-libxslt.node
+        test -f node_modules/libxmljs2/build/Release/xmljs.node
+        echo "✅ Build artifacts present"
+
+    - name: Verify rpath is baked into the binary
+      run: readelf -d build/Release/node-libxslt.node | grep -E "RUNPATH|RPATH"
+
+    - name: Test module loading on musl
+      run: node -e "const x = require('./index.js'); if (typeof x.parse !== 'function') process.exit(1); console.log('✅ Module loads on Alpine/musl')"
+
+    - name: Run tests
+      run: npm test
+
   security:
     runs-on: ubuntu-latest
     

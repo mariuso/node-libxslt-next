@@ -26,6 +26,25 @@ From source:
 
     npm run rebuild
 
+### Alpine / musl
+
+The native addon is built from source on install, so the build toolchain must be
+present. On Alpine (musl libc) install it first:
+
+    apk add --no-cache build-base python3
+
+This is also required in Alpine-based Docker images, e.g. `node:24-alpine`:
+
+```dockerfile
+FROM node:24-alpine
+RUN apk add --no-cache build-base python3
+# ... npm install
+```
+
+> Versions before 1.0.10 failed to load on musl with
+> `Error loading shared library xmljs.node ... (ERR_DLOPEN_FAILED)`.
+> 1.0.10 adds an rpath so the addon resolves its libxmljs2 dependency on musl.
+
 Basic usage
 -----------
 
