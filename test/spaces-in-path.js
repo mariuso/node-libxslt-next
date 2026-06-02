@@ -7,14 +7,6 @@ const os = require('os');
 
 console.log('Testing package installation in path with spaces...');
 
-// Windows is skipped for now: a fresh build into a spaced directory there is a
-// separate concern (it also hits an EPERM on the loaded .node during cleanup),
-// and is not yet verified. The Linux/macOS path below exercises the real fix.
-if (process.platform === 'win32') {
-  console.log('Skipping spaces-in-path test on Windows (not yet supported).');
-  process.exit(0);
-}
-
 // Create a temporary directory with spaces in the name
 const testDirName = 'test with spaces';
 const testDir = path.join(os.tmpdir(), testDirName);
