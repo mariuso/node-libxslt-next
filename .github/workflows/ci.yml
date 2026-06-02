@@ -86,6 +86,9 @@ jobs:
     - name: Test module loading
       run: node -e "console.log('✅ Module loads:', !!require('./index.js'))"
 
+    - name: Build and load in a path containing spaces
+      run: npm run test:spaces
+
   alpine-musl:
     # Regression test for ERR_DLOPEN_FAILED on musl (Alpine): node-libxslt.node
     # links xmljs.node by basename, which musl resolves via the runtime library
