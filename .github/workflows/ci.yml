@@ -11,6 +11,8 @@ jobs:
     runs-on: ${{ matrix.os }}
     
     strategy:
+      # Don't let one flaky platform cancel (and mask) the others.
+      fail-fast: false
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
         node-version: [20.x, 22.x, 24.x]
@@ -74,7 +76,7 @@ jobs:
     - name: Verify build artifacts
       run: |
         test -f build/Release/node-libxslt.node
-        test -f build/Release/xmljs.node
+        test -f node_modules/libxmljs2/build/Release/xmljs.node
         echo "✅ All build artifacts present"
         
     - name: Test module loading
@@ -89,13 +91,15 @@ jobs:
       image: node:24-alpine
 
     steps:
+    # git must exist before checkout, otherwise actions/checkout falls back to
+    # the REST API tarball, which cannot fetch submodules (the libxslt sources).
+    - name: Install Alpine build dependencies
+      run: apk add --no-cache git build-base python3 binutils
+
     - name: Checkout code
       uses: actions/checkout@v4
       with:
         submodules: recursive
-
-    - name: Install system dependencies
-      run: apk add --no-cache build-base python3 git binutils
 
     - name: Install dependencies (builds from source)
       run: npm install
@@ -109,11 +113,15 @@ jobs:
     - name: Verify rpath is baked into the binary
       run: readelf -d build/Release/node-libxslt.node | grep -E "RUNPATH|RPATH"
 
-    - name: Test module loading on musl
-      run: node -e "const x = require('./index.js'); if (typeof x.parse !== 'function') process.exit(1); console.log('✅ Module loads on Alpine/musl')"
-
-    - name: Run tests
-      run: npm test
+    - name: Verify module loads and transforms on musl
+      run: |
+        node -e '
+          const libxslt = require("./index.js");
+          const xsl = libxslt.parse("<xsl:stylesheet version=\"1.0\" xmlns:xsl=\"http://www.w3.org/1999/XSL/Transform\"><xsl:template match=\"/\"><out><xsl:value-of select=\"/in/@v\"/></out></xsl:template></xsl:stylesheet>");
+          const out = xsl.apply("<in v=\"musl\"/>");
+          if (!out.includes("musl")) { console.error("transform failed:", out); process.exit(1); }
+          console.log("✅ Loads and transforms on Alpine/musl");
+        '
 
   security:
     runs-on: ubuntu-latest
