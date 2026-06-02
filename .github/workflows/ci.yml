@@ -14,8 +14,12 @@ jobs:
       # Don't let one flaky platform cancel (and mask) the others.
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
-        node-version: [20.x, 22.x, 24.x]
+        # windows-2022 pinned: the windows-latest image ships Visual Studio
+        # 2026 (v18), which node-gyp cannot yet detect
+        # (https://github.com/nodejs/node-gyp/issues/3282). VS 2022 (v17) builds fine.
+        # node 20 dropped: libxmljs2@0.37 requires node >=22 and segfaults on 20.
+        os: [ubuntu-latest, macos-latest, windows-2022]
+        node-version: [22.x, 24.x]
         
     steps:
     - name: Checkout code

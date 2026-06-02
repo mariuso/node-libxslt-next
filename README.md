@@ -7,8 +7,8 @@ libxslt-next
 
 Node.js bindings for [libxslt](http://xmlsoft.org/libxslt/) compatible with [libxmljs2](https://github.com/libxmljs/libxmljs2).
 
-> **⚡ Node.js Compatibility Update**: This version supports Node.js 20.x, 22.x, and 24.x LTS versions. 
-> For users upgrading from Node.js 18 or earlier versions, this package now uses modern dependencies and APIs for improved compatibility and performance.
+> **⚡ Node.js Compatibility Update**: This version supports Node.js 22.x and 24.x LTS versions.
+> For users upgrading from Node.js 20 or earlier versions, this package now uses modern dependencies and APIs for improved compatibility and performance.
 
 Installation
 ------------
@@ -189,17 +189,20 @@ Conclusion:
 Environment compatibility
 -------------------------
 
-**Node.js Support**: This package supports Node.js 20.x, 22.x, and 24.x LTS versions.
+**Node.js Support**: This package supports Node.js 22.x and 24.x LTS versions.
+Node.js 20 is not supported because `libxmljs2@0.37` requires Node.js >= 22.
 
 **Platform Support**: 
-- ✅ Linux (64-bit)
+- ✅ Linux (64-bit, glibc and musl/Alpine)
 - ✅ macOS (Intel & Apple Silicon)
 - ✅ Windows (64-bit)
 
-**Build Requirements**: libxslt-next depends on [node-gyp](https://github.com/TooTallNate/node-gyp) for native compilation. You will need:
-- Node.js 20.0.0 or higher
+**Build Requirements**: libxslt-next depends on [node-gyp](https://github.com/nodejs/node-gyp) for native compilation. You will need:
+- Node.js 22.0.0 or higher
 - Python 3.x
-- C++ build tools (Visual Studio Build Tools on Windows)
+- C++ build tools (Visual Studio Build Tools on Windows). Note: node-gyp does not
+  yet detect Visual Studio 2026 ([node-gyp#3282](https://github.com/nodejs/node-gyp/issues/3282));
+  use Visual Studio 2022 build tools.
 
 **Dependencies**: This package uses:
 - [libxmljs2](https://github.com/libxmljs/libxmljs2) for XML parsing (replaces deprecated libxmljs)

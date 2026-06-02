@@ -1,7 +1,7 @@
 {
   "name": "libxslt-next",
   "version": "1.0.10",
-  "description": "Node.js bindings for libxslt with Node.js 20/22/24 support - Modern fork with updated dependencies",
+  "description": "Node.js bindings for libxslt with Node.js 22/24 support - Modern fork with updated dependencies",
   "main": "index.js",
   "types": "index.d.ts",
   "files": [
@@ -31,7 +31,6 @@
     "xslt",
     "libxslt",
     "bindings",
-    "node20",
     "node22",
     "node24",
     "modern",
@@ -54,7 +53,7 @@
   },
   "license": "MIT",
   "engines": {
-    "node": ">=20.0.0"
+    "node": ">=22.0.0"
   },
   "dependencies": {
     "bindings": "^1.5.0",
