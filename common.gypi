@@ -8,8 +8,11 @@
     ],
     'conditions': [
       ['OS=="win"', {
+        # Link against libxmljs2's import library in its own build dir, resolved
+        # via require.resolve. Using <(PRODUCT_DIR)/xmljs.lib pointed at this
+        # addon's build dir, where xmljs.lib never exists -> LNK1181.
         'libraries': [
-          '<(PRODUCT_DIR)/xmljs.lib'
+          '<!(node -p "require(\'path\').join(require(\'path\').dirname(require.resolve(\'libxmljs2\')), \'build\', process.env.npm_config_build_type || \'Release\', \'xmljs.lib\')")'
         ],
       }, {
         'libraries': [
