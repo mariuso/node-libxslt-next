@@ -1,8 +1,7 @@
 {
+  'includes': ['../common.gypi'],
   'variables': {
     'target_arch%': 'ia32', # build for a 32-bit CPU by default
-    'xmljs_include_dirs%': [],
-    'xmljs_libraries%': [],
   },
   'target_defaults': {
     'default_configuration': 'Release',
@@ -28,8 +27,7 @@
     'include_dirs': [
       'libxslt/',
       # platform and arch-specific headers
-      'libxslt.config/<(OS)/<(target_arch)',
-      '<@(xmljs_include_dirs)'
+      'libxslt.config/<(OS)/<(target_arch)'
     ]
   },
   'targets': [
@@ -59,21 +57,12 @@
         'libxslt/libxslt/xsltlocale.c',
         'libxslt/libxslt/xsltutils.c'
       ],
-      'dependencies': [
-        '<(node_xmljs)/binding.gyp:xmljs'
-      ],
-      'link_settings': {
-        'libraries': [
-          '<@(xmljs_libraries)',
-        ]
-      },
       'direct_dependent_settings': {
         'defines': ['LIBXSLT_STATIC'],
         'include_dirs': [
           'libxslt/',
           # platform and arch-specific headers
-          'libxslt.config/<(OS)/<(target_arch)',
-          '<@(xmljs_include_dirs)'
+          'libxslt.config/<(OS)/<(target_arch)'
         ],
       }
     },
@@ -95,11 +84,6 @@
       'dependencies': [
         'libxslt'
       ],
-      'link_settings': {
-        'libraries': [
-          '<@(xmljs_libraries)'
-        ]
-      }
     }
   ]
 }
